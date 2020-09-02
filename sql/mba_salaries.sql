@@ -16,12 +16,34 @@
 -- ORDER BY salary 
 -- DESC LIMIT 10;
 
--- SELECT * FROM Salaries where playerID='kershcl01' ORDER by yearID DESC limit 10 -- Kershaw's Salaries in decade
+-- SELECT * FROM Salaries where playerID='kershcl01' ORDER by yearID DESC limit 10; -- Kershaw's Salaries in decade
 
 -- sum of Kershaw's Salaries from LAD, wow Kershaw is rich bro...
-SELECT sum(salary)
-FROM Salaries
-WHERE playerID='kershcl01'
+-- SELECT sum(salary) -- also can use AVG, etc for other functions
+-- FROM Salaries
+-- WHERE playerID='kershcl01';
 
+ -- Ryu's Salaries in 3 years
+-- SELECT * FROM Salaries where playerID='ryuhy01' ORDER by yearID DESC limit 10;
 
--- SELECT * FROM Salaries where playerID='ryuhy01' ORDER by yearID DESC limit 10 -- Ryu's Salaries in 3 years
+-- get names of players from People table
+-- SELECT nameFirst || ' ' || nameLast AS name from People limit 10;
+
+-- Find out name of player by playerID
+-- SELECT nameFirst || ' ' || nameLast FROM People WHERE  playerID='ryuhy01' ;
+
+-- Find out the unique number of names in Players
+-- SELECT COUNT(DISTINCT(nameFirst || ' ' || nameLast)) FROM People;
+
+-- find out duplicate names
+-- SELECT nameFirst || ' ' || nameLast AS name, COUNT(*) from People GROUP BY name HAVING COUNT(*) > 1
+
+-- Figure out the most highest salaries in MLB team
+SELECT 
+	yearID,
+	teamID,
+	SUM(salary) AS total_salary
+FROM
+	Salaries
+GROUP BY yearID, teamID
+ORDER BY SUM(salary) DESC
