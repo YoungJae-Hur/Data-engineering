@@ -7,12 +7,22 @@
 --    yearID, playerID, salary 
 --FROM Salaries LIMIT 10;
 
-SELECT * FROM 
-Salaries 
-WHERE teamID="LAN" 
-and yearID="2016" 
-ORDER BY salary  
-DESC limit 100; -- DESC, ASC for ordering
+-- SELECT * FROM 
+-- Salaries 
+-- WHERE teamID="LAN" 
+-- and yearID="2016" 
+-- ORDER BY salary  
+-- DESC limit 100; -- DESC, ASC for ordering
+
+-- 2. SUM, AVG
+-- select * from Salaries
+-- where playerID = 'rodrial01'
+-- order by yearID asc
+
+-- 2.1 find the summation of aggregate of salaries in entire career
+select sum(salary)
+from Salaries   
+where playerID = 'rodrial01'
 
 -- SELECT * FROM -- selecting top 10 salaries from NL MLB players in LA Dodgers
 -- 	Salaries
