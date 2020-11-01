@@ -1,12 +1,18 @@
--- SELECT * FROM Salaries LIMIT 100;
+-- 1. Top Ten Salaries: select, where, order by
+--SELECT * FROM Salaries LIMIT 10;
 
 -- SELECT yearID FROM Salaries LIMIT 10;
 
--- SELECT 
--- 	yearID, playerID, salary 
--- FROM Salaries LIMIT 10;
+--SELECT 
+--    yearID, playerID, salary 
+--FROM Salaries LIMIT 10;
 
--- SELECT * FROM Salaries ORDER BY salary DESC limit 100; -- DESC, ASC for ordering
+SELECT * FROM 
+Salaries 
+WHERE teamID="LAN" 
+and yearID="2016" 
+ORDER BY salary  
+DESC limit 100; -- DESC, ASC for ordering
 
 -- SELECT * FROM -- selecting top 10 salaries from NL MLB players in LA Dodgers
 -- 	Salaries
@@ -39,11 +45,11 @@
 -- SELECT nameFirst || ' ' || nameLast AS name, COUNT(*) from People GROUP BY name HAVING COUNT(*) > 1
 
 -- Figure out the most highest salaries in MLB team
-SELECT 
-	yearID,
-	teamID,
-	SUM(salary) AS total_salary
-FROM
-	Salaries
-GROUP BY yearID, teamID
-ORDER BY SUM(salary) DESC
+--SELECT
+--	yearID,
+--	teamID,
+--	SUM(salary) AS total_salary
+--FROM
+--	Salaries
+--GROUP BY yearID, teamID
+--ORDER BY SUM(salary) DESC
