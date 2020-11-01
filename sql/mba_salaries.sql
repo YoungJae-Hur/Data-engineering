@@ -31,10 +31,24 @@
 -- limit 15; 
 
 -- 3.1 find full name by its playerID
+-- select nameFirst || ' ' || nameLast
+-- as Fullname
+-- from People
+-- where playerID = 'rodrial01'; -- ryuhy01
+
+-- 3.2 count unique names in table
+-- select
+-- count(distinct(nameFirst || ' ' || nameLast))
+-- from People;
+
+-- 3.3 count names who have same full names
 select nameFirst || ' ' || nameLast
-as Fullname
+as Fullname,
+COUNT(*)
 from People
-where playerID = 'rodrial01'; -- ryuhy01
+group by
+Fullname
+having COUNT(*) > 1;
 
 -- SELECT * FROM -- selecting top 10 salaries from NL MLB players in LA Dodgers
 -- 	Salaries
