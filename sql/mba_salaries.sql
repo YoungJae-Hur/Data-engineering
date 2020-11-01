@@ -42,13 +42,27 @@
 -- from People;
 
 -- 3.3 count names who have same full names
-select nameFirst || ' ' || nameLast
-as Fullname,
-COUNT(*)
-from People
+-- select nameFirst || ' ' || nameLast
+-- as Fullname,
+-- COUNT(*)
+-- from People
+-- group by
+-- Fullname
+-- having COUNT(*) > 1;
+
+-- 3.4 find the team that spent most in the history
+select 
+    teamID,
+    SUM(salary) as Total_salary
+from
+    Salaries
+where 
+    yearID = '2016'
 group by
-Fullname
-having COUNT(*) > 1;
+    teamID
+order by
+    Total_salary desc
+    
 
 -- SELECT * FROM -- selecting top 10 salaries from NL MLB players in LA Dodgers
 -- 	Salaries
