@@ -17,12 +17,24 @@
 -- 2. SUM, AVG
 -- select * from Salaries
 -- where playerID = 'rodrial01'
--- order by yearID asc
+-- order by yearID asc; 
 
 -- 2.1 find the summation of aggregate of salaries in entire career
-select sum(salary)
-from Salaries   
-where playerID = 'rodrial01'
+-- select sum(salary)
+-- from Salaries   
+-- where playerID = 'rodrial01';
+
+-- 3. concat function, DISTINCT
+-- select nameFirst || ' ' || nameLast -- MySQL version select CONCAT(nameFirst, nameLast) from People limit 10;
+-- as Fullname
+-- from People
+-- limit 15; 
+
+-- 3.1 find full name by its playerID
+select nameFirst || ' ' || nameLast
+as Fullname
+from People
+where playerID = 'rodrial01'; -- ryuhy01
 
 -- SELECT * FROM -- selecting top 10 salaries from NL MLB players in LA Dodgers
 -- 	Salaries
