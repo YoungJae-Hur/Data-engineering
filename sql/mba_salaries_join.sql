@@ -25,3 +25,27 @@ where
     t1.yearID = '2016'
 group by
     t1.teamID
+
+-- left join
+select
+    *
+from
+    People t1
+left join 
+    AllstarFull t2 on t2.playerID = t1.playerID
+limit 20;
+
+-- left join application
+-- find the players who went allstart game the most
+select
+    t1.playerID,
+    count(*) as cnt
+from
+    People t1
+left join 
+    AllstarFull t2 on t2.playerID = t1.playerID
+group by
+    t1.playerID
+order by
+    cnt desc
+limit 20
