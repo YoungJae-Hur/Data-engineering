@@ -15,3 +15,14 @@ select DATETIME(current_timestamp, '+1 DAY'); -- adds another day from current d
 
 select DATETIME('NOW');
 select current_timestamp;
+
+-- CASE WHEN
+select
+    id, 
+    name,
+    CASE WHEN
+        name = 'youngjae' then 'ok'
+    ELSE 'No ok'
+    END AS name_ok,
+    debut
+from mytable;
