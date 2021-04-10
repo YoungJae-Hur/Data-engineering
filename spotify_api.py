@@ -9,7 +9,17 @@ client_secret =
 
 def main():
     header = getHeader(client_id, client_secret)
-    print("2. header: ", header)
+
+    # Spotify SearchAPI
+    params = {
+        "q": "BTS",
+        "type": "artist",
+        "limit": "5" # number of results
+    }
+    api_url = "https://api.spotify.com/v1/search"
+    req = requests.get(api_url, params=params, headers=header)
+    # print("3. req status code: ", req.status_code)
+    # print("4. req text: ", req.text)
 
 def getHeader(client_id, client_secret):
     endpoint_url = "https://accounts.spotify.com/api/token"
