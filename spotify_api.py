@@ -4,7 +4,7 @@ import base64
 import json
 import logging
 
-client_id = "3c13c0645e2c4362a9dd432816c374e1"
+client_id = "3c13c0645e2c4362a9dd432816c374e1" # 3c13c0645e2c4362a9dd432816c374e1
 client_secret =
 
 def main():
@@ -16,10 +16,30 @@ def main():
         "type": "artist",
         "limit": "5" # number of results
     }
-    api_url = "https://api.spotify.com/v1/search"
-    req = requests.get(api_url, params=params, headers=header)
-    # print("3. req status code: ", req.status_code)
-    # print("4. req text: ", req.text)
+
+    try:
+        api_url = "https://api.spotify.com/v1/search"
+        req = requests.get(api_url, params=params, headers=header)
+    except:
+        logging.error(req.text)
+
+        # Error cases reference: https://developer.spotify.com/documentation/web-api/
+        if req.status_code != 200:
+            logging.error(json.loads(req.text))
+
+            if req.status_code == 429: # "Too Many Requests - Rate limiting has been applied."
+                retry_after = json.loads(req.headers)['Retry-After']
+                time.sleep(int(retry_after))
+                req = requests.get(api_url, params=params, headers=header)
+
+            elif req.status_code == 401: # access token is denied
+                logging.error("Access token is denied. Retring...")
+                header = getHeader(client_id, client_secret)
+                req = requests.get(api_url, params=params, headers=header)
+
+            else:
+                sys.exit(1)
+
 
 def getHeader(client_id, client_secret):
     endpoint_url = "https://accounts.spotify.com/api/token"
@@ -34,7 +54,13 @@ def getHeader(client_id, client_secret):
     }
 
     req = requests.post(endpoint_url, data=body_param, headers=header)
-    access_token = json.loads(req.text)['access_token']
+
+    try:
+        access_token = json.loads(req.text)['access_token']
+    except:
+        logging.error("Valid access token required")
+        sys.exit(1)
+
     return_header = {
         "Authorization": "Bearer {}".format(access_token)
     }
