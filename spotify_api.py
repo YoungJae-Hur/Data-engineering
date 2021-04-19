@@ -27,18 +27,31 @@ def main():
         if req.status_code != 200:
             logging.error(json.loads(req.text))
 
-            if req.status_code == 429: # "Too Many Requests - Rate limiting has been applied."
+            # "Too Many Requests - Rate limiting has been applied."
+            if req.status_code == 429:
                 retry_after = json.loads(req.headers)['Retry-After']
                 time.sleep(int(retry_after))
                 req = requests.get(api_url, params=params, headers=header)
 
-            elif req.status_code == 401: # access token is denied
+            # access token is denied
+            elif req.status_code == 401:
                 logging.error("Access token is denied. Retring...")
                 header = getHeader(client_id, client_secret)
                 req = requests.get(api_url, params=params, headers=header)
 
             else:
                 sys.exit(1)
+
+    # Extract artist id
+    id = extractID(req.text)
+    # print("1. id: ", id)
+
+def extractID(text):
+    try:
+        id = json.loads(text)['artists']['items'][0]['id']
+    except:
+        logging.error("Extracting id failed.")
+    return id
 
 
 def getHeader(client_id, client_secret):
