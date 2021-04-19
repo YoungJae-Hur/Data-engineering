@@ -8,6 +8,7 @@ client_id = "3c13c0645e2c4362a9dd432816c374e1" # 3c13c0645e2c4362a9dd432816c374e
 client_secret =
 
 def main():
+    logging.basicConfig(level = logging.INFO)
     header = getHeader(client_id, client_secret)
 
     # Spotify SearchAPI
@@ -56,6 +57,7 @@ def main():
         raw_data = json.loads(req.text)
         next = raw_data['next']
         albums.extend(raw_data['items'])
+    logging.info("Total number of albums: " + str(len(albums)))
 
 def extractID(text):
     try:
