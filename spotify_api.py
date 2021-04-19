@@ -12,7 +12,7 @@ def main():
 
     # Spotify SearchAPI
     params = {
-        "q": "BTS",
+        "q": "BTS",      # etc, SG Wannabe
         "type": "artist",
         "limit": "5" # number of results
     }
@@ -44,7 +44,18 @@ def main():
 
     # Extract artist id
     id = extractID(req.text)
-    # print("1. id: ", id)
+
+    # Get BTS total number of albums
+    req = requests.get("https://api.spotify.com/v1/artists/{}/albums".format(id), headers=header)
+    raw_data = json.loads(req.text)
+
+    albums = []
+    next = raw_data['next']
+    while next:
+        req = requests.get(next, headers=header)
+        raw_data = json.loads(req.text)
+        next = raw_data['next']
+        albums.extend(raw_data['items'])
 
 def extractID(text):
     try:
