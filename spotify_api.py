@@ -3,11 +3,22 @@ import requests
 import base64
 import json
 import logging
+import pymysql
+from aws_setting import (
+    get_host, get_port, get_user, get_db_pw, get_db_name
+)
 
 client_id = "3c13c0645e2c4362a9dd432816c374e1" # 3c13c0645e2c4362a9dd432816c374e1
-client_secret =
+client_secret = "76a0764310434ae4bcc0b2cc3774d23d"
 
 def main():
+    # aws db connection
+    cursor = connectAWSdb()
+    print("success")
+    cursor.execute("SHOW TABLES")
+    print(cursor.fetchall())
+    sys.exit(0)
+
     logging.basicConfig(level = logging.INFO)
     header = getHeader(client_id, client_secret)
 
@@ -41,7 +52,7 @@ def main():
                 req = requests.get(api_url, params=params, headers=header)
 
             else:
-                sys.exit(1)
+                sys.exit(1) # unsuccessful
 
     # Extract artist id
     id = extractID(req.text)
@@ -58,6 +69,29 @@ def main():
         next = raw_data['next']
         albums.extend(raw_data['items'])
     logging.info("Total number of albums: " + str(len(albums)))
+
+def connectAWSdb():
+    host = get_host()
+    port = get_port()
+    usr = get_user()
+    pw = get_db_pw()
+    db = get_db_name()
+    
+    # Connect to AWS database
+    try:
+        conn = pymysql.connect(host=host,
+                             user=usr,
+                             password=pw,
+                             db=db,
+                             port=port,
+                             use_unicode=True,
+                             charset='utf8')
+        cursor = conn.cursor()
+    except:
+        logging.error("AWS DB connection failed...")
+        sys.exit(1)
+
+    return cursor
 
 def extractID(text):
     try:
