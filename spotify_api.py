@@ -15,10 +15,16 @@ def main():
     logging.basicConfig(level = logging.INFO)
 
     # aws db connection
-    cursor = connectAWSdb()
+    conn, cursor = connectAWSdb()
     logging.info("Connected to AWS Database...")
     cursor.execute("SHOW TABLES")
     logging.info(cursor.fetchall())
+
+    # INSERTing data to db
+    # query = "INSERT INTO artist_genres (artist_id, genre) VALUES ('2346', 'rock')"
+    # cursor.execute(query)
+    # conn.commit()
+    # logging.info("Insertion is completed...")
     # sys.exit(0)
 
     header = getHeader(client_id, client_secret)
@@ -92,7 +98,7 @@ def connectAWSdb():
         logging.error("AWS DB connection failed...")
         sys.exit(1)
 
-    return cursor
+    return (conn, cursor)
 
 def extractID(text):
     try:
