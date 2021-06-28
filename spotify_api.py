@@ -8,8 +8,8 @@ from aws_setting import (
     get_host, get_port, get_user, get_db_pw, get_db_name
 )
 
-client_id = ""
-client_secret = ""
+client_id = "3c13c0645e2c4362a9dd432816c374e1"
+client_secret = "1d50cc68502a46c69d506a7cf76d38ab"
 
 def main():
     logging.basicConfig(level = logging.INFO)
@@ -27,6 +27,7 @@ def main():
     # logging.info("Insertion is completed...")
     # sys.exit(0)
 
+    # Get Spotify connection using client id and secret key
     header = getHeader(client_id, client_secret)
 
     # Spotify SearchAPI params
