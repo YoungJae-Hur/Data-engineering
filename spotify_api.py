@@ -8,25 +8,26 @@ from aws_setting import (
     get_host, get_port, get_user, get_db_pw, get_db_name
 )
 
-client_id = "3c13c0645e2c4362a9dd432816c374e1" # 3c13c0645e2c4362a9dd432816c374e1
-client_secret = "76a0764310434ae4bcc0b2cc3774d23d"
+client_id = ""
+client_secret = ""
 
 def main():
+    logging.basicConfig(level = logging.INFO)
+
     # aws db connection
     cursor = connectAWSdb()
-    print("success")
+    logging.info("Connected to AWS Database...")
     cursor.execute("SHOW TABLES")
-    print(cursor.fetchall())
-    sys.exit(0)
+    logging.info(cursor.fetchall())
+    # sys.exit(0)
 
-    logging.basicConfig(level = logging.INFO)
     header = getHeader(client_id, client_secret)
 
-    # Spotify SearchAPI
+    # Spotify SearchAPI params
     params = {
-        "q": "BTS",      # etc, SG Wannabe
+        "q": "BTS",        # etc, SG Wannabe
         "type": "artist",
-        "limit": "5" # number of results
+        "limit": "5"       # number of results
     }
 
     try:
@@ -35,7 +36,7 @@ def main():
     except:
         logging.error(req.text)
 
-        # Error cases reference: https://developer.spotify.com/documentation/web-api/
+        # Error case reference: https://developer.spotify.com/documentation/web-api/
         if req.status_code != 200:
             logging.error(json.loads(req.text))
 
