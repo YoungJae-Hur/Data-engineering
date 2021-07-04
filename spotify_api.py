@@ -9,7 +9,7 @@ from aws_setting import (
 )
 
 client_id = "3c13c0645e2c4362a9dd432816c374e1"
-client_secret = "1d50cc68502a46c69d506a7cf76d38ab"
+client_secret = "f7ceedd980a94a91a05c1f9a6d2db220"
 
 def main():
     logging.basicConfig(level = logging.INFO)
@@ -19,13 +19,15 @@ def main():
     logging.info("Connected to AWS Database...")
     cursor.execute("SHOW TABLES")
     logging.info(cursor.fetchall())
+    # cursor.execute("SELECT * from artist_genres")
+    # logging.info(cursor.fetchall())
 
-    # INSERTing data to db
-    # query = "INSERT INTO artist_genres (artist_id, genre) VALUES ('2346', 'rock')"
-    # cursor.execute(query)
-    # conn.commit()
-    # logging.info("Insertion is completed...")
-    # sys.exit(0)
+    # INSERT data to db
+    query = "INSERT INTO artist_genres (artist_id, genre) VALUES ('%s', '%s')" % ('2345', 'pop')
+    cursor.execute(query)
+    conn.commit()
+    logging.info("Insertion is completed...")
+    sys.exit(0)
 
     # Get Spotify connection using client id and secret key
     header = getHeader(client_id, client_secret)
