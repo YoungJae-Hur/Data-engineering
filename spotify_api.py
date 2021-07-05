@@ -9,7 +9,7 @@ from aws_setting import (
 )
 
 client_id = "3c13c0645e2c4362a9dd432816c374e1"
-client_secret = "f7ceedd980a94a91a05c1f9a6d2db220"
+client_secret = ""
 
 def main():
     logging.basicConfig(level = logging.INFO)
@@ -22,8 +22,8 @@ def main():
     # cursor.execute("SELECT * from artist_genres")
     # logging.info(cursor.fetchall())
 
-    # INSERT data to db
-    query = "INSERT INTO artist_genres (artist_id, genre) VALUES ('%s', '%s')" % ('2345', 'pop')
+    # INSERT data to db, but duplicate does not work
+    query = "INSERT INTO artist_genres (artist_id, genre) VALUES ('{}', '{}')".format('2345', 'hip-hop')
     cursor.execute(query)
     conn.commit()
     logging.info("Insertion is completed...")
