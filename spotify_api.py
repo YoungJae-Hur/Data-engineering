@@ -23,11 +23,11 @@ def main():
     # logging.info(cursor.fetchall())
 
     # INSERT data to db, but duplicate does not work
-    query = "INSERT INTO artist_genres (artist_id, genre) VALUES ('{}', '{}')".format('2345', 'hip-hop')
-    cursor.execute(query)
-    conn.commit()
-    logging.info("Insertion is completed...")
-    sys.exit(0)
+    # query = "INSERT INTO artist_genres (artist_id, genre) VALUES ('{}', '{}')".format('2345', 'hip-hop')
+    # cursor.execute(query)
+    # conn.commit()
+    # logging.info("Insertion is completed...")
+    # sys.exit(0)
 
     # Get Spotify connection using client id and secret key
     header = getHeader(client_id, client_secret)
@@ -63,6 +63,10 @@ def main():
 
             else:
                 sys.exit(1) # unsuccessful
+
+    raw = json.loads(req.text)
+    # print(raw['artists'])
+    # print(raw['artists'].keys()) # sees all the keys under the 'artists' key
 
     # Extract artist id
     id = extractID(req.text)
