@@ -37,6 +37,9 @@ def main():
             retry_after = json.loads(r.headers)['Retry-After']
             time.sleep(int(retry_after))
 
+            # retry after a certain time period
+            r = requests.get("https://api.spotify.com/v1/search", params=params, headers=header)
+
 
 
 
