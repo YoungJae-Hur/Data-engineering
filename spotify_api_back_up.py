@@ -54,10 +54,19 @@ def main():
     offset = raw_data["offset"]
     limit = raw_data["limit"]
     next = raw_data["next"]
-    # print("1. total: ", total)
-    # print("2. offset: ", offset)
-    # print("3. limit: ", limit)
-    # print("4. next: ", next)
+
+    albums = []
+    albums.extend(raw_data["items"])
+    # 4. returns only 100 or less albums (pagination handlling)
+    cnt = 0
+    while cnt < 100 and next:
+        r = requests.get(raw_data["next"], headers=header)
+        raw_data = json.loads(r.text)
+        next = raw_data["next"]
+
+        albums.extend(raw_data["items"])
+        cnt = len(albums)
+    print(len(albums))
 
 
 
