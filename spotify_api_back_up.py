@@ -43,6 +43,8 @@ def main():
         elif r.status_code == 401: # access token expired error
             headers = get_headers(client_id, client_secret)
             r = requests.get("https://api.spotify.com/v1/search", params=params, headers=header)
+        else:
+            sys.exit(1)
 
 
 
