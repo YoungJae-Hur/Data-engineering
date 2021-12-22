@@ -25,9 +25,10 @@ def main():
     except:
         logging.error(r.text)
         sys.exit(1)
-    print("1. r.status_code: ", r.status_code)
+    # print("1. r.status_code: ", r.status_code)
     # print("2. r.text: ", r.text) 
     # print("3. r.headers: ", r.headers)
+    logging.info("Successfully done for search")
 
     # Check for the error handling
     if r.status_code != 200:
@@ -39,6 +40,11 @@ def main():
 
             # retry after a certain time period
             r = requests.get("https://api.spotify.com/v1/search", params=params, headers=header)
+        elif r.status_code == 401: # access token expired error
+            headers = get_headers(client_id, client_secret)
+            r = requests.get("https://api.spotify.com/v1/search", params=params, headers=header)
+
+
 
 
 
