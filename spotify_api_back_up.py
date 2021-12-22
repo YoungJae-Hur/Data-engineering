@@ -18,7 +18,7 @@ def main():
         "limit": "5"       # number of results
     }
 
-    # send a request for search
+    # 1. Send a request for search
     r = requests.get("https://api.spotify.com/v1/search", params=params, headers=header)
     try:
         r = requests.get("https://api.spotify.com/v1/search", params=params, headers=header)
@@ -30,7 +30,7 @@ def main():
     # print("3. r.headers: ", r.headers)
     logging.info("Successfully done for search")
 
-    # Check for the error handling
+    # 2. Check for the error handling
     if r.status_code != 200:
         logging.error(json.loads(r.text))
 
@@ -46,6 +46,18 @@ def main():
         else:
             sys.exit(1)
 
+    # 3. get BTS albums
+    r = requests.get("https://api.spotify.com/v1/artists/3Nrfpe0tUJi4K4DXYWgMUX/albums", headers=header)
+    raw_data = json.loads(r.text)
+
+    total = raw_data["total"]
+    offset = raw_data["offset"]
+    limit = raw_data["limit"]
+    next = raw_data["next"]
+    # print("1. total: ", total)
+    # print("2. offset: ", offset)
+    # print("3. limit: ", limit)
+    # print("4. next: ", next)
 
 
 
