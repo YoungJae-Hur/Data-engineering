@@ -3,34 +3,16 @@ import requests
 import base64
 import json
 import logging
+import time
 import pymysql
-from aws_setting import (
-    get_host, get_port, get_user, get_db_pw, get_db_name
-)
+from aws import getDataBase, getPassword, getPort, getUserName, getHost
+from spotify_credential import get_ClientSecret
 
 client_id = "3c13c0645e2c4362a9dd432816c374e1"
-client_secret = ""
+client_secret = get_ClientSecret()
 
 def main():
-    logging.basicConfig(level = logging.INFO)
-
-    # aws db connection
-    conn, cursor = connectAWSdb()
-    logging.info("Connected to AWS Database...")
-    cursor.execute("SHOW TABLES")
-    logging.info(cursor.fetchall())
-    # cursor.execute("SELECT * from artist_genres")
-    # logging.info(cursor.fetchall())
-
-    # INSERT data to db, but duplicate does not work
-    # query = "INSERT INTO artist_genres (artist_id, genre) VALUES ('{}', '{}')".format('2345', 'hip-hop')
-    # cursor.execute(query)
-    # conn.commit()
-    # logging.info("Insertion is completed...")
-    # sys.exit(0)
-
-    # Get Spotify connection using client id and secret key
-    header = getHeader(client_id, client_secret)
+    header = get_headers(client_id, client_secret)
 
     # Spotify SearchAPI params
     params = {
@@ -39,106 +21,96 @@ def main():
         "limit": "5"       # number of results
     }
 
+    # 1. Send a request for search
+    r = requests.get("https://api.spotify.com/v1/search", params=params, headers=header)
     try:
-        api_url = "https://api.spotify.com/v1/search"
-        req = requests.get(api_url, params=params, headers=header)
+        r = requests.get("https://api.spotify.com/v1/search", params=params, headers=header)
     except:
-        logging.error(req.text)
+        logging.error(r.text)
+        sys.exit(1)
+    logging.info("Successfully done for search")
 
-        # Error case reference: https://developer.spotify.com/documentation/web-api/
-        if req.status_code != 200:
-            logging.error(json.loads(req.text))
+    # 2. Check for the error handling
+    if r.status_code != 200:
+        logging.error(json.loads(r.text))
 
-            # "Too Many Requests - Rate limiting has been applied."
-            if req.status_code == 429:
-                retry_after = json.loads(req.headers)['Retry-After']
-                time.sleep(int(retry_after))
-                req = requests.get(api_url, params=params, headers=header)
+        if r.status_code == 429: # too many requests
+            retry_after = json.loads(r.headers)['Retry-After']
+            time.sleep(int(retry_after))
 
-            # access token is denied
-            elif req.status_code == 401:
-                logging.error("Access token is denied. Retring...")
-                header = getHeader(client_id, client_secret)
-                req = requests.get(api_url, params=params, headers=header)
+            # retry after a certain time period
+            r = requests.get("https://api.spotify.com/v1/search", params=params, headers=header)
+        elif r.status_code == 401: # access token expired error
+            headers = get_headers(client_id, client_secret)
+            r = requests.get("https://api.spotify.com/v1/search", params=params, headers=header)
+        else:
+            sys.exit(1)
 
-            else:
-                sys.exit(1) # unsuccessful
+    # 3. get BTS albums
+    r = requests.get("https://api.spotify.com/v1/artists/3Nrfpe0tUJi4K4DXYWgMUX/albums", headers=header)
+    raw_data = json.loads(r.text)
 
-    raw = json.loads(req.text)
-    # print(raw['artists'])
-    # print(raw['artists'].keys()) # sees all the keys under the 'artists' key
-
-    # Extract artist id
-    id = extractID(req.text)
-
-    # Get BTS total number of albums
-    req = requests.get("https://api.spotify.com/v1/artists/{}/albums".format(id), headers=header)
-    raw_data = json.loads(req.text)
+    total = raw_data["total"]
+    offset = raw_data["offset"]
+    limit = raw_data["limit"]
+    next = raw_data["next"]
 
     albums = []
-    next = raw_data['next']
-    while next:
-        req = requests.get(next, headers=header)
-        raw_data = json.loads(req.text)
-        next = raw_data['next']
-        albums.extend(raw_data['items'])
-    logging.info("Total number of albums: " + str(len(albums)))
+    albums.extend(raw_data["items"])
 
-def connectAWSdb():
-    host = get_host()
-    port = get_port()
-    usr = get_user()
-    pw = get_db_pw()
-    db = get_db_name()
-    
-    # Connect to AWS database
+    # 4. returns only 100 or less albums (pagination handlling)
+    cnt = 0
+    while cnt < 100 and next:
+        r = requests.get(raw_data["next"], headers=header)
+        raw_data = json.loads(r.text)
+        next = raw_data["next"]
+
+        albums.extend(raw_data["items"])
+        cnt = len(albums)
+    print(len(albums))
+
+    # 5. Connect with AWS RDS
     try:
-        conn = pymysql.connect(host=host,
-                             user=usr,
-                             password=pw,
-                             db=db,
-                             port=port,
-                             use_unicode=True,
-                             charset='utf8')
-        cursor = conn.cursor()
+        connection = pymysql.connect(
+            host=getHost(),
+            user=getUserName(),
+            password=getPassword(),
+            database=getDataBase(),
+            port=getPort(),
+            use_unicode=True,
+            charset='utf8'
+        )
+        cursor = connection.cursor()
     except:
-        logging.error("AWS DB connection failed...")
-        sys.exit(1)
+        logging.error("AWS RDS connection failed...")
+        sys.exit(1) # 1 meaning no success, 0 meaning success
 
-    return (conn, cursor)
-
-def extractID(text):
-    try:
-        id = json.loads(text)['artists']['items'][0]['id']
-    except:
-        logging.error("Extracting id failed.")
-    return id
+    # use cursor for queries
+    cursor.execute("SHOW TABLES")
+    print(cursor.fetchall())
 
 
-def getHeader(client_id, client_secret):
-    endpoint_url = "https://accounts.spotify.com/api/token"
 
-    # encoding format url: https://developer.spotify.com/documentation/general/guides/authorization-guide/
+
+def get_headers(client_id, client_secret):
+    endpoint = "https://accounts.spotify.com/api/token"
     encoded = base64.b64encode("{}:{}".format(client_id, client_secret).encode('utf-8')).decode('ascii')
-    header = {
-        "Authorization": "Basic {}".format(encoded)
+    headers = {
+        "Authorization": "Basic {}".format(encoded),
+        "Content-Type": "application/x-www-form-urlencoded"
     }
-    body_param = {
-        "grant_type": "client_credentials"
+    payload = {
+        "grant_type":"client_credentials"
     }
 
-    req = requests.post(endpoint_url, data=body_param, headers=header)
+    req = requests.post(endpoint, data=payload, headers=headers)
 
-    try:
-        access_token = json.loads(req.text)['access_token']
-    except:
-        logging.error("Valid access token required")
-        sys.exit(1)
+    access_token = json.loads(req.text)["access_token"]
 
-    return_header = {
+    headers = {
         "Authorization": "Bearer {}".format(access_token)
     }
-    return return_header
+    return headers
 
 
 if __name__ == '__main__':
