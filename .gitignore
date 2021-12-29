@@ -5,4 +5,4 @@ __pycache__/
 env/
 
 #aws setting credentials
-aws_setting.py
+aws.py
