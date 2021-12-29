@@ -5,9 +5,11 @@ import json
 import logging
 import time
 import pymysql
+from aws import getDataBase, getPassword, getPort, getUserName, getHost
+from spotify_credential import get_ClientSecret
 
 client_id = "3c13c0645e2c4362a9dd432816c374e1"
-client_secret = "7760d78605f3420ab726cfbe6a0eb79b"
+client_secret = get_ClientSecret()
 
 def main():
     header = get_headers(client_id, client_secret)
@@ -67,6 +69,25 @@ def main():
         cnt = len(albums)
     print(len(albums))
 
+    # 5. Connect with AWS RDS
+    try:
+        connection = pymysql.connect(
+            host=getHost(),
+            user=getUserName(),
+            password=getPassword(),
+            database=getDataBase(),
+            port=getPort(),
+            use_unicode=True,
+            charset='utf8'
+        )
+        cursor = connection.cursor()
+    except:
+        logging.error("AWS RDS connection failed...")
+        sys.exit(1) # 1 meaning no success, 0 meaning success
+
+    # use cursor for queries
+    cursor.execute("SHOW TABLES")
+    print(cursor.fetchall())
 
 
 
