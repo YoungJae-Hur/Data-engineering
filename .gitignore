@@ -4,5 +4,6 @@ __pycache__/
 # python virtual env
 env/
 
-#aws setting credentials
+#aws, spotify credentials files
 aws.py
+spotify_credential.py
