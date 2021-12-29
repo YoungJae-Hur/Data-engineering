@@ -5,5 +5,5 @@ __pycache__/
 env/
 
 #aws, spotify credentials files
-aws.py
+aws_credential.py
 spotify_credential.py
