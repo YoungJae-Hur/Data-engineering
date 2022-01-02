@@ -5,7 +5,7 @@ import json
 import logging
 import time
 import pymysql
-from aws import getDataBase, getPassword, getPort, getUserName, getHost
+from aws_credential import getDataBase, getPassword, getPort, getUserName, getHost
 from spotify_credential import get_ClientSecret
 
 client_id = "3c13c0645e2c4362a9dd432816c374e1"
